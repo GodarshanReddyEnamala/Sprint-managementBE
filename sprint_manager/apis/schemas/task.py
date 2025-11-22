@@ -1,43 +1,55 @@
 from pydantic import BaseModel
-from datetime import date
 
+from enum import Enum
+
+class WorkType(str, Enum):
+    BUG = "Bug"
+    TASK = "Task"
+    STORY = "Story"
+    REVIEW = "Review"
+
+class Workflow(str, Enum):
+    BACKLOG = "Backlog"
+    TODO = "To Do"
+    IN_PROGRESS = "In Progress"
+    ON_HOLD = "On Hold"
+    DONE = "Done"
+
+class Priority(str, Enum):
+    BLOCKER = "Blocker"
+    CRITICAL = "Critical"
+    MAJOR = "Major"
+    MEDIUM = "Medium"
+    MINOR = "Minor"
+    TRIVIAL = "Trivial"
 
 
 class TaskCreate(BaseModel):
 
-    name: str
-    available: str | None = None
-    cost: float | None = None
-    code:str
-    title:str
-    work_type:str 
-    work_flow:str
-    story_points:int | None = None
-    status:str 
-    assign:str | None = None
-    description:str 
-    sub_task:str | None = None
-    start_date:date | None = None
-    end_date:date   | None = None
-    activity :str | None = None
-    details:str | None = None
+    code: str
+    title: str
+    work_type: WorkType
+    work_flow: Workflow
+    story_points: int | None = None
+    user_id: int | None = None
+    description: str | None = None
+    sub_task: int | None = None
+    sprint_id: int
+    project_id: int
+    priority: Priority
 
 
 
 class TaskUpdate(BaseModel):
-    name: str
-    available: str | None = None
-    cost: float | None = None
-    code:str    | None = None
-    title:str | None = None
-    work_type:str | None = None
-    work_flow:str   | None = None
-    story_points:int | None = None
-    status:str | None = None
-    assign:str | None = None
-    description:str | None = None
-    sub_task:str | None = None
-    start_date:date | None = None
-    end_date:date   | None = None
-    activity :str | None = None
-    details:str 
+
+    code: str | None = None
+    title: str | None = None
+    work_type: WorkType | None = None
+    work_flow: Workflow | None = None
+    story_points: int | None = None
+    user_id: int | None = None
+    description: str | None = None
+    sub_task: int | None = None
+    sprint_id: int | None = None
+    project_id: int | None = None
+    priority: Priority | None = None

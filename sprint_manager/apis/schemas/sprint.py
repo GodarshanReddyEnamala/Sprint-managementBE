@@ -1,11 +1,14 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class SprintCreate(BaseModel):
-    name: str
-    start_date: str
-    end_date: str
+    
+    start_date: datetime
+    end_date: datetime
+    project_id: int
+
 
 class SprintUpdate(BaseModel):
-    name: str | None = None
-    start_date: str | None = None
-    end_date: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    project_id: int

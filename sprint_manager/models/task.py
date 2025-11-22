@@ -1,16 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Enum, Text, Date
+from sqlalchemy import Column, Integer, String, Enum, Text, ForeignKey
 from database import Base
 
 
 
-BugType = ('Bug', 'Task', 'Story', 'Review')
-WorkflowType = ('Backlog', 'In Progress', 'On Hold', 'Done')
-StatusType = ('Blocker', 'Critical', 'Major', 'Minor', 'Trivial')
-ActivityType = ('All', 'Comments', 'History', 'Workflow')
-DetailsType = (
-    'Logwork', 'Sprint', 'Priority', 'EstimatedHours', 'Labels', 'Parent',
-    'StartDate', 'EndDate', 'Reporter'
-)
+WorkType = ('Bug', 'Task', 'Story', 'Review')
+Workflow = ('Backlog', 'To Do', 'In Progress', 'On Hold', 'Done')
+Priority = ('Blocker', 'Critical', 'Major','Medium', 'Minor', 'Trivial')
+
 
 
 class Task(Base):
@@ -19,25 +15,16 @@ class Task(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String, index=True)
-    available = Column(Boolean, default=True)
-    cost = Column(Float)
-
-    code = Column(String, index=True)
-    title = Column(String, index=True)
-
-    work_type = Column(Enum(*BugType, name="work_type_enum"), nullable=True)
-    work_flow = Column(Enum(*WorkflowType, name="workflow_enum"), nullable=True)
+    work_type = Column(Enum(*WorkType, name="work_type_enum"), nullable=False)
+    code = Column(String, index=True,  unique=True,nullable=False)
+    title = Column(String, index=True, nullable=False)
+    work_flow = Column(Enum(*Workflow, name="workflow_enum"), nullable=True)
     story_points = Column(Integer, nullable=True)
+    priority = Column(Enum(*Priority, name="status_enum"), nullable=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    sub_task =   Column(Integer, ForeignKey("task.id"), nullable=True)
 
-    status = Column(Enum(*StatusType, name="status_enum"), nullable=True)
+    sprint_id = Column(Integer, ForeignKey ("sprint.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
 
-    assign = Column(String, nullable=True)
     description = Column(Text, nullable=True)
-    sub_task = Column(String, nullable=True)
-
-    start_date = Column(Date, nullable=True)
-    end_date = Column(Date, nullable=True)
-
-    activity = Column(Enum(*ActivityType, name="activity_enum"), nullable=True)
-    details = Column(Enum(*DetailsType, name="details_enum"), nullable=True)
