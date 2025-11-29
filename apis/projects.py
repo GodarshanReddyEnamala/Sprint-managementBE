@@ -16,6 +16,10 @@ def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
     db.refresh(new_project)
     return new_project
 
+# Get all projects
+@router.get("/")
+def get_all_project(db: Session = Depends(get_db)):
+    return db.query(Project).all()
 
 # GET PROJECT
 @router.get("/{id}")

@@ -27,6 +27,11 @@ def get_sprint(id: int, db: Session = Depends(get_db)):
 
     return sprint
 
+# Get all sprints
+@router.get("/")
+def get_all_project(db: Session = Depends(get_db)):
+    return db.query(Sprint).all()
+
 
 # UPDATE SPRINT
 @router.put("/{id}")

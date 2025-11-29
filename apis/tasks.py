@@ -27,6 +27,10 @@ def get_task(id: int, db: Session = Depends(get_db)):
 
     return task
 
+# Get all tasks
+@router.get("/")
+def get_all_tasks(db: Session = Depends(get_db)):
+    return db.query(Task).all()
 
 # UPDATE TASK
 @router.put("/{id}")

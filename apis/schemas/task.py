@@ -30,13 +30,13 @@ class TaskCreate(BaseModel):
     title: str
     work_type: WorkType
     work_flow: Workflow
+    sprint_id: int
+    project_id: int
+    priority: Priority
     story_points: int | None = None
     user_id: int | None = None
     description: str | None = None
     sub_task: int | None = None
-    sprint_id: int
-    project_id: int
-    priority: Priority
 
 
 

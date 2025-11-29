@@ -29,6 +29,17 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return {"User created successfully": new_user}
 
 
+@router.post("/valid")
+def validate_user(getuser: UserGet, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == getuser.email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if getuser.password != user.password:
+        raise HTTPException(status_code=404, detail="Please check your password")
+
+    return user
 
 
 # GET USER BY ID
@@ -41,17 +52,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
     return user
 
-@router.post("/valid")
-def get_user(getuser: UserGet, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == getuser.email).first()
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    if getuser.password != user.password:
-        raise HTTPException(status_code=404, detail="Please check your password")
-
-    return user
 
 
 # UPDATE USER
