@@ -11,9 +11,7 @@ if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable not set")
 genai.configure(api_key=os.getenv(api_key))
 
-models = genai.list_models()
-for model in models:
-     print(model.name, "-", getattr(model, "description", "No description"))
+
 class PromptRequest(BaseModel):
     prompt: str
 

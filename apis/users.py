@@ -71,7 +71,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
     return user
 
 # UPDATE USER
-@router.put("/{id}")
+@router.patch("/{id}")
 def update_user(id: int, user: UserUpdate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.id == id).first()
 

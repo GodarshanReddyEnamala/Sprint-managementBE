@@ -36,6 +36,15 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):\
         code=new_code  
 
     )
+    if not new_task.description:
+        try:
+            prompt=f"generate a description on how to the task in our project in points,make sure length of description is not more than 1000 characters{new_task.title }"
+            request = PromptRequest(prompt=prompt)
+            result = send_task_to_gemini(request)
+            new_task.description = result.get("result", "No description generated")
+       
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=f"Error generating description: {str(e)}")
 
     db.add(new_task)
     db.commit()
@@ -71,9 +80,19 @@ def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
-
+    
     for key, value in task.model_dump(exclude_unset=True).items():
         setattr(db_task, key, value)
+
+    if not db_task.description:
+        try:
+            prompt=f"generate a description specifying the points in general {db_task.title}"
+            request = PromptRequest(prompt=prompt)
+            result = send_task_to_gemini(request)
+            db_task.description = result.get("result", "No description generated")
+       
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=f"Error generating description: {str(e)}")
 
     db.commit()
     db.refresh(db_task)
@@ -81,15 +100,18 @@ def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 # UPDATE DESCRIPTION
+@router.patch("/{id}/description")
 def update_description(id: int, db: Session = Depends(get_db)):
     db_task = db.query(Task).filter(Task.id == id).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
 
     try:
-        request = PromptRequest(prompt=db_task.title)
+        prompt=f"generate a description specifying the points in general {db_task.title}"
+        request = PromptRequest(prompt=prompt)
         result = send_task_to_gemini(request)
         description = result.get("result", "No description generated")
+       
     except Exception as e:
         description = f"Error generating description: {str(e)}"
 
