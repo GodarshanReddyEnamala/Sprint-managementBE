@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models.task import Task
+from models.sprint import Sprint
 from apis.schemas.ai import PromptRequest 
 
 from apis.ai import send_task_to_gemini
@@ -68,10 +69,14 @@ def get_task(id: int, db: Session = Depends(get_db)):
 
     return task
 
-# Get all tasks
-@router.get("/")
-def get_all_tasks(db: Session = Depends(get_db)):
-    return db.query(Task).all()
+@router.get("/{id}")
+def get_all_task_user_sprint(id:int,db:Session=Depends(get_db)):
+    task=db.query(Task).filter(Task.id==id),
+    sprint=db.query(Sprint).filter(Sprint.id==id)
+    if not Task and Sprint:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return  task ,sprint
 
 # UPDATE TASK
 @router.patch("/{id}")
