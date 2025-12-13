@@ -9,3 +9,4 @@ class Sprint(Base):
     start_date=Column(Date,nullable=True)
     end_date=Column(Date,nullable=True)
     project_id = Column(Integer, ForeignKey("project.id"), nullable=True)
+    status = Column(Boolean, default=False)

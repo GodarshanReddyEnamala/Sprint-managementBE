@@ -5,6 +5,8 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 
 
+
+
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:root@localhost:5432/Sprint_Manager"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

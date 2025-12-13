@@ -25,8 +25,7 @@ class Priority(str, Enum):
 
 
 class TaskCreate(BaseModel):
-
-    code: str
+ 
     title: str
     work_type: WorkType
     work_flow: Workflow
@@ -36,20 +35,19 @@ class TaskCreate(BaseModel):
     story_points: int | None = None
     user_id: int | None = None
     description: str | None = None
-    sub_task: int | None = None
+    parent_task: int | None = None
 
 
 
 class TaskUpdate(BaseModel):
 
-    code: str | None = None
     title: str | None = None
     work_type: WorkType | None = None
     work_flow: Workflow | None = None
     story_points: int | None = None
     user_id: int | None = None
     description: str | None = None
-    sub_task: int | None = None
+    parent_task: int | None = None
     sprint_id: int | None = None
     project_id: int | None = None
     priority: Priority | None = None

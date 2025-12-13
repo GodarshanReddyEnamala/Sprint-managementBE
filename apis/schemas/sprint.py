@@ -6,9 +6,11 @@ class SprintCreate(BaseModel):
     start_date: datetime
     end_date: datetime
     project_id: int
+    status: bool = False
 
 
 class SprintUpdate(BaseModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     project_id: int
+    status: bool = False

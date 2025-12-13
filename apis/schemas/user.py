@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
     role: str | None = None
     location: str | None = None
     organisation: str | None = None
+  
 
     @field_validator("mobile")
     def validate_mobile(cls, value):
@@ -24,9 +25,10 @@ class UserCreate(BaseModel):
     def validate_email(cls, value):
         if "@" not in value:
             raise ValueError("Email must contain '@'")
-        if "." not in value.split("@")[-1]:
-            raise ValueError("Email must contain a '.' after '@'")
+        elif "." not in value.split("@")[-1]:
+            raise ValueError("Email must contain '.' after '@'")
         return value
+    
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
@@ -37,7 +39,13 @@ class UserUpdate(BaseModel):
     location: str | None = None
     organisation: str | None = None
 
+
 class UserGet(BaseModel): 
     email: str
     password: str
+
+class AssignProjects(BaseModel):
+    project_ids: list[int]
     
+
+

@@ -16,7 +16,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     work_type = Column(Enum(*WorkType, name="work_type_enum"), nullable=False)
-    code = Column(String, index=True,  unique=True,nullable=False)
+    code = Column(Integer, index=True,  unique=True,nullable=False)
     title = Column(String, index=True, nullable=False)
     work_flow = Column(Enum(*Workflow, name="workflow_enum"), nullable=True)
     story_points = Column(Integer, nullable=True)
