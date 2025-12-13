@@ -2,8 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.task import Task
-from apis.schemas.task import TaskCreate, TaskUpdate
+from apis.schemas.ai import PromptRequest 
+
 from apis.ai import send_task_to_gemini
+from apis.schemas.task import TaskCreate, TaskUpdate
+
 
 router = APIRouter()
 
@@ -78,23 +81,23 @@ def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 # UPDATE DESCRIPTION
-@router.put("/{id}/description")
-def update_description(id: int,  db: Session = Depends(get_db)):
+def update_description(id: int, db: Session = Depends(get_db)):
     db_task = db.query(Task).filter(Task.id == id).first()
-
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
 
     try:
-        description = send_task_to_gemini(db_task.title)
-      
+        request = PromptRequest(prompt=db_task.title)
+        result = send_task_to_gemini(request)
+        description = result.get("result", "No description generated")
     except Exception as e:
-        description = {"error": str(e)}
+        description = f"Error generating description: {str(e)}"
 
-    db_task.description= description
-
+    # Update the task
+    db_task.description = description
     db.commit()
     db.refresh(db_task)
+
     return db_task
 
 
@@ -109,3 +112,6 @@ def delete_task(id: int, db: Session = Depends(get_db)):
     db.delete(task)
     db.commit()
     return {"detail": "Task deleted successfully"}
+
+
+

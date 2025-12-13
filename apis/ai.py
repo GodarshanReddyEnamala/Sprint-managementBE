@@ -1,23 +1,24 @@
-import requests
+from fastapi import APIRouter
+import google.generativeai as genai
 import os
+from pydantic import BaseModel
+from dotenv import load_dotenv
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+load_dotenv()
+router = APIRouter()
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable not set")
+genai.configure(api_key=os.getenv(api_key))
 
-BASE_URL = "https://api.gemini.com/v1"  # Replace with actual Gemini AI endpoint
+models = genai.list_models()
+for model in models:
+     print(model.name, "-", getattr(model, "description", "No description"))
+class PromptRequest(BaseModel):
+    prompt: str
 
-def send_task_to_gemini(task_title: str, task_description: str):
-    """
-    Sends task info to Gemini AI and returns processed response.
-    """
-    url = f"{BASE_URL}/process-task"  # replace with the actual endpoint
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "title": task_title
-    }
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code != 200:
-        raise Exception(f"Gemini API Error: {response.text}")
-    return response.json()
+
+def send_task_to_gemini(request: PromptRequest):
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(request.prompt)
+    return {"result": response.text}
