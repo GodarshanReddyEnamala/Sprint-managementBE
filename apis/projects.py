@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.project import Project
 from apis.schemas.project import ProjectCreate, ProjectUpdate
+from models.user import User
 
 router = APIRouter()
 
@@ -17,9 +18,9 @@ def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
     return new_project
 
 # Get all projects
-@router.get("/")
-def get_all_project(db: Session = Depends(get_db)):
-    return db.query(Project).all()
+@router.get("/user/{user_id}")
+def get_projects_by_user(user_id: int, db: Session = Depends(get_db), ):
+    return db.query(Project).join(Project.users).filter(User.id == user_id).all()
 
 # GET PROJECT
 @router.get("/{id}")

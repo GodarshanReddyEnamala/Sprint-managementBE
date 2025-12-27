@@ -42,6 +42,7 @@ def validate_user(getuser: UserGet, db: Session = Depends(get_db)):
 
     return user
 
+
 @router.post("/add-projects/{user_id}")
 def add_projects_to_user(user_id: int, data: AssignProjects, db: Session = Depends(get_db)):
 
@@ -59,6 +60,10 @@ def add_projects_to_user(user_id: int, data: AssignProjects, db: Session = Depen
 
     db.commit()
     return {"message": "Projects added to user"}
+
+@router.get("/project/{project_id}")
+def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
+    return db.query(User).join(User.projects).filter(Project.id == project_id).all()
 
 # GET USER BY ID
 @router.get("/{id}")
