@@ -69,7 +69,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 
     return task
 
-@router.get("/{sprint_id}")
+@router.get("/sprint/{sprint_id}")
 def get_all_tasks_for_sprint_id(sprint_id: int, db:Session=Depends(get_db)):
     
     sprint=db.query(Sprint).filter(Sprint.id == sprint_id).first()
@@ -91,7 +91,7 @@ def get_all_tasks_for_project_id(project_id: int, db:Session=Depends(get_db)):
     return  tasks 
 
 
-@router.get("/{user_id}")
+@router.get("/user/{user_id}")
 def get_all_task_for_user_sprint(user_id:int,db:Session=Depends(get_db)):
     sprint=db.query(Sprint).filter(Sprint.status==True).first()
     if not sprint:
