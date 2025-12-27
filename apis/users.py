@@ -66,9 +66,9 @@ def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
     return db.query(User).join(User.projects).filter(Project.id == project_id).all()
 
 # GET USER BY ID
-@router.get("/{id}")
-def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == id).first()
+@router.get("/{user_id}")
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -76,9 +76,9 @@ def get_user(id: int, db: Session = Depends(get_db)):
     return user
 
 # UPDATE USER
-@router.patch("/{id}")
-def update_user(id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.id == id).first()
+@router.patch("/{user_id}")
+def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
 
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -92,9 +92,9 @@ def update_user(id: int, user: UserUpdate, db: Session = Depends(get_db)):
 
 
 # DELETE USER
-@router.delete("/{id}")
-def delete_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == id).first()
+@router.delete("/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

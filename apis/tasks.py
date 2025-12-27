@@ -60,9 +60,9 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):\
 
 
 # GET TASK BY ID
-@router.get("/{id}")
-def get_task(id: int, db: Session = Depends(get_db)):
-    task = db.query(Task).filter(Task.id == id).first()
+@router.get("/{task_id}")
+def get_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
 
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -80,29 +80,24 @@ def get_all_tasks_sprint(db:Session=Depends(get_db)):
         raise HTTPException(status_code=404, detail="Tasks not found")
     return  tasks 
 
-@router.get("/{id}")
-def get_all_task_user_sprint(id:int,db:Session=Depends(get_db)):
-    task=db.query(Task).filter(Task.id==id),
-    sprint=db.query(Sprint).filter(Sprint.id==id)
-    if not Task and Sprint:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    return  task ,sprint
 
 @router.get("/{user_id}")
-def filter_tasks_per_sprint(user_id:int,db:Session=Depends(get_db)):
-
-    tasks=db.query(Task).filter(Task.user_id==user_id).all()
-    
-    if not Task:
+def get_all_task_for_user_sprint(user_id:int,db:Session=Depends(get_db)):
+    sprint=db.query(Sprint).filter(Sprint.status==True).first()
+    if not sprint:
+        return []
+    task=db.query(Task).filter(Task.user_id==user_id).all()
+    if not task :
         raise HTTPException(status_code=404, detail="Task not found")
 
-    return  tasks
+    return  task 
+
+
 
 # UPDATE TASK
-@router.patch("/{id}")
-def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
-    db_task = db.query(Task).filter(Task.id == id).first()
+@router.patch("/{task_id}")
+def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
+    db_task = db.query(Task).filter(Task.id == task_id).first()
 
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -126,9 +121,9 @@ def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 # UPDATE DESCRIPTION
-@router.patch("/{id}/description")
-def update_description(id: int, db: Session = Depends(get_db)):
-    db_task = db.query(Task).filter(Task.id == id).first()
+@router.patch("/{task_id}/description")
+def update_description(task_id: int, db: Session = Depends(get_db)):
+    db_task = db.query(Task).filter(Task.id == task_id).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
 
@@ -150,9 +145,9 @@ def update_description(id: int, db: Session = Depends(get_db)):
 
 
 # DELETE TASK
-@router.delete("/{id}")
-def delete_task(id: int, db: Session = Depends(get_db)):
-    task = db.query(Task).filter(Task.id == id).first()
+@router.delete("/{task_id}")
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
 
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")

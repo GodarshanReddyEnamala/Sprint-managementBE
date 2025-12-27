@@ -34,9 +34,9 @@ def get_projects_by_user(user_id: int, db: Session = Depends(get_db), ):
     return db.query(Project).join(Project.users).filter(User.id == user_id).all()
 
 # GET PROJECT
-@router.get("/{id}")
-def get_project(id: int, db: Session = Depends(get_db)):
-    project = db.query(Project).filter(Project.id == id).first()
+@router.get("/{project_id}")
+def get_project(project_id: int, db: Session = Depends(get_db)):
+    project = db.query(Project).filter(Project.id == project_id).first()
 
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -45,9 +45,9 @@ def get_project(id: int, db: Session = Depends(get_db)):
 
 
 # UPDATE PROJECT
-@router.put("/{id}")
-def update_project(id: int, project: ProjectUpdate, db: Session = Depends(get_db)):
-    db_project = db.query(Project).filter(Project.id == id).first()
+@router.put("/{project_id}")
+def update_project(project_id: int, project: ProjectUpdate, db: Session = Depends(get_db)):
+    db_project = db.query(Project).filter(Project.id == project_id).first()
 
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -61,9 +61,9 @@ def update_project(id: int, project: ProjectUpdate, db: Session = Depends(get_db
 
 
 # DELETE PROJECT
-@router.delete("/{id}")
-def delete_project(id: int, db: Session = Depends(get_db)):
-    project = db.query(Project).filter(Project.id == id).first()
+@router.delete("/{project_id}")
+def delete_project(project_id: int, db: Session = Depends(get_db)):
+    project = db.query(Project).filter(Project.id == project_id).first()
 
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
