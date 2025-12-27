@@ -69,15 +69,25 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 
     return task
 
-@router.get("/")
-def get_all_tasks_sprint(db:Session=Depends(get_db)):
+@router.get("/{sprint_id}")
+def get_all_tasks_for_sprint_id(sprint_id: int, db:Session=Depends(get_db)):
     
-    sprint=db.query(Sprint).filter(Sprint.status==True).first()
+    sprint=db.query(Sprint).filter(Sprint.id == sprint_id).first()
     if not sprint:
-        return []
+         raise HTTPException(status_code=404, detail="Sprint not found")
     tasks=db.query(Task).filter(Task.sprint_id==sprint.id).all()
     if not tasks:
         raise HTTPException(status_code=404, detail="Tasks not found")
+    return  tasks 
+
+
+@router.get("/unassigned/{project_id}")
+def get_all_tasks_for_project_id(project_id: int, db:Session=Depends(get_db)):
+    
+    tasks=[]
+
+    tasks=db.query(Task).filter(Task.project_id==project_id, Task.sprint_id==None).all()
+    
     return  tasks 
 
 
@@ -86,9 +96,8 @@ def get_all_task_for_user_sprint(user_id:int,db:Session=Depends(get_db)):
     sprint=db.query(Sprint).filter(Sprint.status==True).first()
     if not sprint:
         return []
+    task=[]
     task=db.query(Task).filter(Task.user_id==user_id).all()
-    if not task :
-        raise HTTPException(status_code=404, detail="Task not found")
 
     return  task 
 

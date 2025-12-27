@@ -18,7 +18,7 @@ def create_sprint(sprint: SprintCreate, db: Session = Depends(get_db)):
 
 
 # GET SPRINT BY ID
-@router.get("/{sprint_id}")
+@router.get("/{sprint_id}/fetch")
 def get_sprint(sprint_id: int, db: Session = Depends(get_db)):
     sprint = db.query(Sprint).filter(Sprint.id == sprint_id).first()
 
@@ -28,9 +28,9 @@ def get_sprint(sprint_id: int, db: Session = Depends(get_db)):
     return sprint
 
 # Get all sprints
-@router.get("/")
-def get_all_project(db: Session = Depends(get_db)):
-    return db.query(Sprint).all()
+@router.get("/{project_id}")
+def get_all_sprint(project_id: int, db: Session = Depends(get_db)):
+    return db.query(Sprint).filter(Sprint.project_id == project_id).all()
 
 
 # UPDATE SPRINT

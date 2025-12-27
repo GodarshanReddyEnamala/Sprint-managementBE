@@ -8,6 +8,7 @@ class UserCreate(BaseModel):
     role: str | None = None
     location: str | None = None
     organisation: str | None = None
+    is_admin: bool = False
   
 
     @field_validator("mobile")
@@ -43,8 +44,7 @@ class UserGet(BaseModel):
     email: str
     password: str
 
-class AssignProjects(BaseModel):
-    project_ids: list[int]
+
     
 
 

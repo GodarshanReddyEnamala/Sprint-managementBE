@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.project import Project
-from apis.schemas.project import ProjectCreate, ProjectUpdate
+from apis.schemas.project import AssignUsers, ProjectCreate, ProjectUpdate
 from models.user import User
 
 router = APIRouter()
@@ -72,3 +72,19 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Project deleted successfully"}
+
+@router.post("/add-users/{project_id}")
+def add_users_to_project(project_id: int, data: AssignUsers, db: Session = Depends(get_db)):
+
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    users = db.query(User).filter(User.id.in_(data.user_ids)).all()
+    if not users:
+        raise HTTPException(status_code=404, detail="No valid users found") 
+    for user in users:
+        if user not in project.users:
+            project.users.append(user)
+
+    db.commit()
+    return {"message": "Projects added to user"}

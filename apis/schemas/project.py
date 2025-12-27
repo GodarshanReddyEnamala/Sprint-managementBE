@@ -11,3 +11,5 @@ class ProjectCreate(BaseModel):
 class ProjectUpdate(BaseModel):
     title: str | None = None
     
+class AssignUsers(BaseModel):
+    user_ids: list[int]

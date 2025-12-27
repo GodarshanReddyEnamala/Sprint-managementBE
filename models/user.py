@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean
 from database import Base
 from sqlalchemy.orm import relationship
 
@@ -16,4 +16,5 @@ class User(Base):
     location=Column(String,index=True, nullable=True)
     organisation=Column(String,index=True, nullable=True)
     projects = relationship("Project", secondary=user_projects, back_populates="users")
+    is_admin=Column(Boolean, default=False)  # 0 for False, 1 for True
     

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.user import User   # correct model
 from models.project import Project
-from apis.schemas.user import UserCreate, UserUpdate, UserGet, AssignProjects
+from apis.schemas.user import UserCreate, UserUpdate, UserGet
 
 router = APIRouter()
 
@@ -43,27 +43,16 @@ def validate_user(getuser: UserGet, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/add-projects/{user_id}")
-def add_projects_to_user(user_id: int, data: AssignProjects, db: Session = Depends(get_db)):
 
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    # Fetch valid projects
-    projects = db.query(Project).filter(Project.id.in_(data.project_ids)).all()
-
-    # Add only new ones
-    for p in projects:
-        if p not in user.projects:
-            user.projects.append(p)
-
-    db.commit()
-    return {"message": "Projects added to user"}
 
 @router.get("/project/{project_id}")
 def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
     return db.query(User).join(User.projects).filter(Project.id == project_id).all()
+
+
+@router.get("/organisation/{organisation}")  
+def get_users_by_organisation(organisation: str, db: Session = Depends(get_db), ):
+    return db.query(User).filter(User.organisation == organisation).all()
 
 # GET USER BY ID
 @router.get("/{user_id}")
