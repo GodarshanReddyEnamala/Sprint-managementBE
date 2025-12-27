@@ -75,9 +75,9 @@ def get_all_tasks_for_sprint_id(sprint_id: int, db:Session=Depends(get_db)):
     sprint=db.query(Sprint).filter(Sprint.id == sprint_id).first()
     if not sprint:
          raise HTTPException(status_code=404, detail="Sprint not found")
+    tasks=[]
     tasks=db.query(Task).filter(Task.sprint_id==sprint.id).all()
-    if not tasks:
-        raise HTTPException(status_code=404, detail="Tasks not found")
+    
     return  tasks 
 
 
