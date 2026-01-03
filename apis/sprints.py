@@ -2,19 +2,55 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.sprint import Sprint
+from models.project import Project
+
+
 from apis.schemas.sprint import SprintCreate, SprintUpdate
 
 router = APIRouter()
 
 
 # CREATE SPRINT
+
 @router.post("/")
 def create_sprint(sprint: SprintCreate, db: Session = Depends(get_db)):
+
+    # Validate project
+    project = db.query(Project).filter(Project.id == sprint.project_id).first()
+    if not project:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid project_id"
+        )
+
+    #  Validate dates
+    if sprint.end_date <= sprint.start_date:
+        raise HTTPException(
+            status_code=400,
+            detail="End date must be after start date"
+        )
+
+    # Prevent overlapping sprints
+    existing_sprint = db.query(Sprint).filter(
+        Sprint.project_id == sprint.project_id,
+        Sprint.start_date <= sprint.end_date,
+        Sprint.end_date >= sprint.start_date
+    ).first()
+
+    if existing_sprint:
+        raise HTTPException(
+            status_code=400,
+            detail="Sprint already exists or overlaps with another sprint"
+        )
+
+    # Create sprint
     new_sprint = Sprint(**sprint.model_dump())
     db.add(new_sprint)
     db.commit()
     db.refresh(new_sprint)
+
     return new_sprint
+
 
 
 # GET SPRINT BY ID
