@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException,Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.task import Task
 from models.sprint import Sprint
 from apis.schemas.ai import PromptRequest 
+from typing import Optional
 
 from apis.ai import send_task_to_gemini
 from apis.schemas.task import TaskCreate, TaskUpdate
@@ -56,6 +57,42 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):\
        
     }
 
+@router.get("/all/{project_id}")
+def get_all_tasks(
+    project_id: int, 
+    sprint_id: Optional[int] = None, 
+    user_id: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Task).filter(Task.project_id == project_id)
+
+    if sprint_id is not None:
+        query = query.filter(Task.sprint_id == sprint_id)
+    
+    if user_id is not None:
+        query = query.filter(Task.user_id == user_id)
+
+    return query.all()
+
+
+@router.get("/unassigned/{project_id}")
+def get_unassigned_tasks(
+    project_id: int, 
+    sprint_id: Optional[int] = None, 
+    db: Session = Depends(get_db)
+):
+    # Base query: must match project and must be unassigned (user_id is NULL)
+    query = db.query(Task).filter(
+        Task.project_id == project_id,
+        Task.user_id.is_(None) 
+    )
+
+    # Optional: filter by a specific sprint if provided
+    # If sprint_id is None, it will return ALL unassigned tasks in the project
+    if sprint_id is not None:
+        query = query.filter(Task.sprint_id == sprint_id)
+
+    return query.all()
 
 # GET TASK BY ID
 @router.get("/{task_id}")
@@ -66,48 +103,6 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=TASK_NOT_FOUND)
 
     return task
-
-
-@router.get("/sprint/{sprint_id}")
-def get_all_tasks_for_sprint_id(sprint_id: int, db:Session=Depends(get_db)):
-    
-    sprint=db.query(Sprint).filter(Sprint.id == sprint_id).first()
-    if not sprint:
-         raise HTTPException(status_code=404, detail="Sprint not found")
-    tasks=[]
-    tasks=db.query(Task).filter(Task.sprint_id==sprint.id).all()
-    
-    return  tasks 
-
-
-@router.get("/unassigned/{project_id}")
-def get_all_tasks_for_project_id(project_id: int, db:Session=Depends(get_db)):
-    
-    tasks=[]
-
-    tasks=db.query(Task).filter(Task.project_id==project_id, Task.sprint_id==None).all()
-    
-    return  tasks 
-
-
-@router.get("/{sprint_id}/user/{user_id}")
-def get_all_task_for_user_sprint(user_id:int, sprint_id:int, db:Session=Depends(get_db)):
-    sprint=db.query(Sprint).filter(Sprint.id==sprint_id).first()
-    if not sprint:
-        return []
-    tasks=[]
-    tasks=db.query(Task).filter(Task.user_id==user_id, Task.sprint_id==sprint.id).all()
-
-    return  tasks 
-
-
-@router.get("/user/{user_id}")
-def get_all_task_for_user_backlog(user_id:int,  db:Session=Depends(get_db)):
-    
-    tasks=[]
-    tasks=db.query(Task).filter(Task.user_id==user_id, Task.sprint_id==None).all()
-
-    return  tasks 
 
 
 # UPDATE TASK
