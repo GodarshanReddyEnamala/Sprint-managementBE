@@ -95,7 +95,7 @@ def end_sprint(sprint_id: int, db: Session = Depends(get_db)):
     sprint.status = False
     sprint.end_date = date.today()
     db.commit()
-    return {"message": "Sprint deleted successfully"}
+    return {"message": "Sprint ended successfully"}
 
 # DELETE SPRINT
 @router.delete("/{sprint_id}")
