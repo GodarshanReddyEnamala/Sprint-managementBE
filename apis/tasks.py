@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.task import Task
-from models.sprint import Sprint
 from apis.schemas.ai import PromptRequest 
 from typing import Optional
+from fastapi import Query
 
 from apis.ai import send_task_to_gemini
 from apis.schemas.task import TaskCreate, TaskUpdate
@@ -119,7 +119,7 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
     if not db_task.description:
         try:
-            prompt=f"generate a description specifying the points in general {db_task.title}"
+            prompt=f"generate a description on how to do the {db_task.title } task in our project in points, make sure length of description is not more than 1000 characters"
             request = PromptRequest(prompt=prompt)
             result = send_task_to_gemini(request)
             db_task.description = result.get("result", NO_DESCRIPTION_GENERATED)
