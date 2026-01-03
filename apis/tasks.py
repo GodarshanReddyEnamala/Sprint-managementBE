@@ -101,6 +101,15 @@ def get_all_task_for_user_sprint(user_id:int, sprint_id:int, db:Session=Depends(
     return  tasks 
 
 
+@router.get("/user/{user_id}")
+def get_all_task_for_user_backlog(user_id:int,  db:Session=Depends(get_db)):
+    
+    tasks=[]
+    tasks=db.query(Task).filter(Task.user_id==user_id, Task.sprint_id==None).all()
+
+    return  tasks 
+
+
 # UPDATE TASK
 @router.patch("/{task_id}")
 def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
