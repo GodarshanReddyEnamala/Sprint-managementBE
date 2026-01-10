@@ -28,10 +28,13 @@ def create_project(project_data: ProjectCreate, db: Session = Depends(get_db)):
     
     return new_project
 
+
+
 # Get all projects
 @router.get("/user/{user_id}")
 def get_projects_by_user(user_id: int, db: Session = Depends(get_db), ):
     return db.query(Project).join(Project.users).filter(User.id == user_id).all()
+
 
 # GET PROJECT
 @router.get("/{project_id}")
@@ -72,6 +75,7 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Project deleted successfully"}
+
 
 @router.post("/add-users/{project_id}")
 def add_users_to_project(project_id: int, data: AssignUsers, db: Session = Depends(get_db)):

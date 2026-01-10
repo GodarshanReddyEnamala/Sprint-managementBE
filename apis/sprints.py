@@ -11,8 +11,9 @@ from apis.schemas.sprint import SprintCreate, SprintUpdate
 router = APIRouter()
 
 SPRINT_NOT_FOUND = "Sprint not found"
-# CREATE SPRINT
 
+
+# CREATE SPRINT
 @router.post("/")
 def create_sprint(sprint: SprintCreate, db: Session = Depends(get_db)):
 
@@ -53,7 +54,6 @@ def create_sprint(sprint: SprintCreate, db: Session = Depends(get_db)):
     return new_sprint
 
 
-
 # GET SPRINT BY ID
 @router.get("/{sprint_id}/fetch")
 def get_sprint(sprint_id: int, db: Session = Depends(get_db)):
@@ -63,6 +63,7 @@ def get_sprint(sprint_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=SPRINT_NOT_FOUND)
 
     return sprint
+
 
 # Get all sprints
 @router.get("/{project_id}")
@@ -85,6 +86,7 @@ def update_sprint(sprint_id: int, sprint: SprintUpdate, db: Session = Depends(ge
     db.refresh(db_sprint)
     return db_sprint
 
+
 @router.patch("/{sprint_id}")
 def end_sprint(sprint_id: int, db: Session = Depends(get_db)):
     sprint = db.query(Sprint).filter(Sprint.id == sprint_id).first()
@@ -96,6 +98,7 @@ def end_sprint(sprint_id: int, db: Session = Depends(get_db)):
     sprint.end_date = date.today()
     db.commit()
     return {"message": "Sprint ended successfully"}
+
 
 # DELETE SPRINT
 @router.delete("/{sprint_id}")

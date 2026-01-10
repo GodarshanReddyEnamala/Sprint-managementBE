@@ -87,13 +87,14 @@ def get_unassigned_tasks(
         Task.project_id == project_id,
         Task.user_id.is_(None) 
     )
-
     # Optional: filter by a specific sprint if provided
     # If sprint_id is None, it will return ALL unassigned tasks in the project
     if sprint_id is not None:
         query = query.filter(Task.sprint_id == sprint_id)
 
     return query.all()
+
+
 
 # GET TASK BY ID
 @router.get("/{task_id}")
@@ -133,7 +134,6 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 
-
 # UPDATE DESCRIPTION
 @router.patch("/{task_id}/description")
 def update_description(task_id: int, req: PromptRequest, db: Session = Depends(get_db)):
@@ -158,6 +158,7 @@ def update_description(task_id: int, req: PromptRequest, db: Session = Depends(g
     return db_task
 
 
+
 # DELETE TASK
 @router.delete("/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
@@ -169,6 +170,7 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(task)
     db.commit()
     return {"detail": "Task deleted successfully"}
+
 
 
 # 🔍 SEARCH TASKS
@@ -188,6 +190,3 @@ def search_tasks(
         return tasks
     else:
         return "No task is found with your search!"
-
-
-

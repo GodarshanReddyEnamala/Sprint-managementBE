@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends,HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-from sqlalchemy import or_
 
 from database import get_db
 from models.task import Task
@@ -34,6 +32,3 @@ def search_tasks(payload: SearchTaskRequest, db: Session = Depends(get_db)):
         )
 
     return tasks
-        
-        
-    

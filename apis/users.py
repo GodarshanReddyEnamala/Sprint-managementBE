@@ -12,7 +12,6 @@ router = APIRouter()
 @router.post("/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
-    
     existing_email = db.query(User).filter(User.email == user.email).first()
     if existing_email:
         return { "Email id is already registered"}
@@ -43,8 +42,6 @@ def validate_user(getuser: UserGet, db: Session = Depends(get_db)):
     return user
 
 
-
-
 @router.get("/project/{project_id}")
 def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
     return db.query(User).join(User.projects).filter(Project.id == project_id).all()
@@ -53,6 +50,7 @@ def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
 @router.get("/organisation/{organisation}")  
 def get_users_by_organisation(organisation: str, db: Session = Depends(get_db), ):
     return db.query(User).filter(User.organisation == organisation).all()
+
 
 # GET USER BY ID
 @router.get("/{user_id}")
@@ -63,6 +61,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
 
 # UPDATE USER
 @router.patch("/{user_id}")
@@ -91,5 +90,3 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(user)
     db.commit()
     return {"message": "User deleted successfully"}
-
-
