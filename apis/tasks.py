@@ -79,20 +79,30 @@ def get_all_tasks(
 @router.get("/unassigned/{project_id}")
 def get_unassigned_tasks(
     project_id: int, 
+    user_id: Optional[int] = None, 
     sprint_id: Optional[int] = None, 
+    backlog: Optional[bool]= False,
     db: Session = Depends(get_db)
 ):
-    # Base query: must match project and must be unassigned (user_id is NULL)
+    # Base query: must match project and must be unassigned (sprint_id is NULL)
     query = db.query(Task).filter(
-        Task.project_id == project_id,
-        Task.user_id.is_(None) 
+        Task.project_id == project_id 
     )
     # Optional: filter by a specific sprint if provided
-    # If sprint_id is None, it will return ALL unassigned tasks in the project
-    if sprint_id is not None:
-        query = query.filter(Task.sprint_id == sprint_id)
+    # If user_id, it will return ALL assigned tasks in the project for that user where sprint_id is null
+    if user_id is not None:
+        query = query.filter(Task.user_id == user_id, Task.sprint_id.is_(None))
+         
+
+    elif sprint_id is not None:
+        query = query.filter(Task.sprint_id == sprint_id, Task.user_id.is_(None))
+
+    elif backlog:
+        query = query.filter(Task.user_id.is_(None), Task.sprint_id.is_(None))
 
     return query.all()
+
+
 
 
 
