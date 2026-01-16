@@ -16,7 +16,7 @@ def create_project(project_data: ProjectCreate, db: Session = Depends(get_db)):
     users_to_add = db.query(User).filter(User.id.in_(project_data.users)).all()
 
     # 2. Create the Project instance
-    new_project = Project(title=project_data.title)
+    new_project = Project(title=project_data.title, manager_id = project_data.manager_id)
 
     # 3. Establish the relationship
     # This automatically creates entries in the 'user_projects' table

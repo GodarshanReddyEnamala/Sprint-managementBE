@@ -126,7 +126,7 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
     if not db_task.description:
         try:
-            prompt=f"generate a description on how to do the {db_task.title } task in our project in points, make sure length of description is not more than 1000 characters"
+            prompt=f"generate a description on how to develop the {db_task.title } task in our project in points, make sure length of description is not more than 1000 characters"
             request = PromptRequest(prompt=prompt)
             result = send_task_to_gemini(request)
             db_task.description = result.get("result", NO_DESCRIPTION_GENERATED)
