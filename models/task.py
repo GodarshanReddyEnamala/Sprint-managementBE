@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Enum, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Text, ForeignKey, DateTime
 from database import Base
-
+from datetime import datetime, timezone
 
 
 WorkType = ('Bug', 'Task', 'Story', 'Review')
@@ -28,3 +28,5 @@ class Task(Base):
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
 
     description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)

@@ -5,7 +5,7 @@ from models.task import Task
 from apis.schemas.ai import PromptRequest 
 from typing import Optional
 from fastapi import Query
-
+import datetime
 from apis.ai import send_task_to_gemini
 from apis.schemas.task import TaskCreate, TaskUpdate
 from apis.schemas.task import validate_search_query
@@ -45,10 +45,11 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):\
             request = PromptRequest(prompt=prompt)
             result = send_task_to_gemini(request)
             new_task.description = result.get("result", NO_DESCRIPTION_GENERATED)
+            new_task.created_at = datetime.datetime.now(datetime.timezone.utc)
        
         except Exception as e:
             raise HTTPException(status_code=404, detail=f"Error generating description: {str(e)}")
-
+    new_task.created_at = datetime.datetime.now(datetime.timezone.utc)
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
@@ -133,7 +134,7 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
        
         except Exception as e:
             raise HTTPException(status_code=404, detail=f"Error generating description: {str(e)}")
-
+    db_task.updated_at=  datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(db_task)
     return db_task
@@ -158,6 +159,7 @@ def update_description(task_id: int, req: PromptRequest, db: Session = Depends(g
 
     # Update the task
     db_task.description = description
+    db_task.updated_at =  datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(db_task)
 

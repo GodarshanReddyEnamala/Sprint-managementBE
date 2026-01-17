@@ -4,6 +4,7 @@ from database import get_db
 from models.project import Project
 from apis.schemas.project import AssignUsers, ProjectCreate, ProjectUpdate
 from models.user import User
+import datetime 
 
 router = APIRouter()
 
@@ -21,6 +22,8 @@ def create_project(project_data: ProjectCreate, db: Session = Depends(get_db)):
     # 3. Establish the relationship
     # This automatically creates entries in the 'user_projects' table
     new_project.users = users_to_add
+
+    new_project.created_at = datetime.datetime.now(datetime.timezone.utc)
 
     db.add(new_project)
     db.commit()
@@ -58,6 +61,7 @@ def update_project(project_id: int, project: ProjectUpdate, db: Session = Depend
     for key, value in project.model_dump(exclude_unset=True).items():
         setattr(db_project, key, value)
 
+    db_project.created_at =  datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(db_project)
     return db_project

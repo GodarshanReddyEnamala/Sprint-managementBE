@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from database import Base
 from sqlalchemy.orm import relationship
+from datetime import datetime, timezone
 
 from models.association import user_projects
 
@@ -17,4 +18,5 @@ class User(Base):
     organisation=Column(String,index=True, nullable=True)
     projects = relationship("Project", secondary=user_projects, back_populates="users")
     is_admin=Column(Boolean, default=False)  # 0 for False, 1 for True
-    
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)

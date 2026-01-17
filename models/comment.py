@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime,timezone
 from database import Base
 
 
@@ -15,7 +15,8 @@ class Comment(Base):
 
     content = Column(String, nullable=False)
 
-    created_at = Column(DateTime, default=datetime.timezone.utc, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
 
     parent_id = Column(Integer, ForeignKey("comment.id"), nullable=True)
 

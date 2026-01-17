@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.sprint import Sprint
 from models.project import Project
-
+import datetime
 
 from apis.schemas.sprint import SprintCreate, SprintUpdate
 
@@ -47,6 +47,7 @@ def create_sprint(sprint: SprintCreate, db: Session = Depends(get_db)):
 
     # Create sprint
     new_sprint = Sprint(**sprint.model_dump())
+    new_sprint.created_at = datetime.datetime.now(datetime.timezone.utc)
     db.add(new_sprint)
     db.commit()
     db.refresh(new_sprint)
@@ -82,6 +83,7 @@ def update_sprint(sprint_id: int, sprint: SprintUpdate, db: Session = Depends(ge
     for key, value in sprint.model_dump(exclude_unset=True).items():
         setattr(db_sprint, key, value)
 
+    db_sprint.updated_at =  datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(db_sprint)
     return db_sprint

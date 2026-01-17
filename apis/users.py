@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models.user import User   # correct model
 from models.project import Project
 from apis.schemas.user import UserCreate, UserUpdate, UserGet
+import datetime
 
 router = APIRouter()
 
@@ -14,14 +15,23 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     existing_email = db.query(User).filter(User.email == user.email).first()
     if existing_email:
-        return { "Email id is already registered"}
+        # Use HTTPException so the frontend 'catch' block triggers
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email ID is already registered"
+        )
 
     if user.mobile:
         existing_mobile = db.query(User).filter(User.mobile == user.mobile).first()
         if existing_mobile:
-            return {"error": "Mobile number already registered"}
-
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Mobile number already registered"
+            )
+        
     new_user = User(**user.model_dump())
+    new_user.organisation = user.email.split('@')[-1]
+    new_user.created_at = datetime.datetime.now(datetime.timezone.utc)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -73,7 +83,8 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
 
     for key, value in user.model_dump(exclude_unset=True).items():
         setattr(db_user, key, value)
-
+    
+    db_user.updated_at =  datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(db_user)
     return db_user
