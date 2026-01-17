@@ -96,3 +96,4 @@ def add_users_to_project(project_id: int, data: AssignUsers, db: Session = Depen
 
     db.commit()
     return {"message": "Projects added to user"}
+

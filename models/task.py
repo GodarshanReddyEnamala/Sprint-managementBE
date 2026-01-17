@@ -3,8 +3,8 @@ from database import Base
 from datetime import datetime, timezone
 
 
-WorkType = ('Bug', 'Task', 'Story', 'Review')
-Workflow = ('Backlog', 'To Do', 'In Progress', 'On Hold', 'Done')
+WorkType = ('Bug', 'Task', 'Story', 'Review', 'Closed - Won\'t Do')
+Workflow = ('Backlog', 'To Do', 'In Progress', 'On Hold', 'QA', 'Review' , 'Closed - Won\'t Do', 'Done')
 Priority = ('Blocker', 'Critical', 'Major','Medium', 'Minor', 'Trivial')
 
 

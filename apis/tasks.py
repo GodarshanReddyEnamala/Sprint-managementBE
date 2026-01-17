@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.task import Task
 from apis.schemas.ai import PromptRequest 
-from typing import Optional
+from typing import List, Optional
 from fastapi import Query
 import datetime
 from apis.ai import send_task_to_gemini
-from apis.schemas.task import TaskCreate, TaskUpdate
+from apis.schemas.task import TaskCreate, TaskUpdate, Workflow, WorkType, Priority
 from apis.schemas.task import validate_search_query
 
 
@@ -59,46 +59,95 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):\
        
     }
 
-@router.get("/all/{project_id}")
+@router.get("/all") # Removed {project_id} because you are passing a List in the query
 def get_all_tasks(
-    project_id: int, 
-    sprint_id: Optional[int] = None, 
-    user_id: Optional[int] = None,
+    # Use Query() to handle list parameters in the URL correctly
+    project_ids: List[int] = Query(...), 
+    sprint_ids: Optional[List[int]] = Query(None), 
+    user_ids: Optional[List[int]] = Query(None),
+    work_type: Optional[WorkType] = None,
+    work_flow: Optional[Workflow] = None,
+    priority: Optional[Priority] = None,
+    story_points: Optional[int] = None, 
+    description: Optional[str] = None,
+    parent_task: Optional[int] = None, 
     db: Session = Depends(get_db)
 ):
-    query = db.query(Task).filter(Task.project_id == project_id)
+    # 1. Use .in_() for lists instead of the Python 'in' keyword
+    query = db.query(Task).filter(Task.project_id.in_(project_ids))
 
-    if sprint_id is not None:
-        query = query.filter(Task.sprint_id == sprint_id)
+    if sprint_ids:
+        query = query.filter(Task.sprint_id.in_(sprint_ids))
     
-    if user_id is not None:
-        query = query.filter(Task.user_id == user_id)
+    if user_ids:
+        query = query.filter(Task.user_id.in_(user_ids))
+
+    # 2. Direct comparisons for single values
+    if work_type:
+        query = query.filter(Task.work_type == work_type)
+
+    if work_flow:
+        query = query.filter(Task.work_flow == work_flow)
+
+    if priority:
+        query = query.filter(Task.priority == priority)
+
+    if story_points is not None:
+        query = query.filter(Task.story_points == story_points)
+
+    # 3. Use .contains() for descriptions to allow partial searches
+    if description:
+        query = query.filter(Task.description.contains(description))
+
+    if parent_task is not None:
+        query = query.filter(Task.parent_task == parent_task)
 
     return query.all()
 
 
-@router.get("/unassigned/{project_id}")
+@router.get("/unassigned")
 def get_unassigned_tasks(
-    project_id: int, 
-    user_id: Optional[int] = None, 
-    sprint_id: Optional[int] = None, 
-    backlog: Optional[bool]= False,
+    project_ids: List[int] = Query(...), 
+    user_ids: Optional[List[int]] = Query(None), 
+    sprint_ids: Optional[List[int]] = Query(None), 
+    backlog: bool = False,
+    work_type: Optional[WorkType] = None,
+    work_flow: Optional[Workflow] = None,
+    priority: Optional[Priority] = None,
+    story_points: Optional[int] = None, 
+    description: Optional[str] = None,
+    parent_task: Optional[int] = None, 
     db: Session = Depends(get_db)
 ):
-    # Base query: must match project and must be unassigned (sprint_id is NULL)
-    query = db.query(Task).filter(
-        Task.project_id == project_id 
-    )
-    # Optional: filter by a specific sprint if provided
-    # If user_id, it will return ALL assigned tasks in the project for that user where sprint_id is null
-    if user_id is not None:
-        query = query.filter(Task.user_id == user_id, Task.sprint_id.is_(None))
-         
-    elif sprint_id is not None:
-        query = query.filter(Task.sprint_id == sprint_id, Task.user_id.is_(None))
+    # Base query restricted to the projects provided
+    query = db.query(Task).filter(Task.project_id.in_(project_ids))
 
-    elif backlog:
-        query = query.filter(Task.user_id.is_(None), Task.sprint_id.is_(None))
+    if backlog:
+        # Pure Backlog:  no sprint
+        query = query.filter( Task.sprint_id.is_(None))
+         
+    elif sprint_ids:
+        # Assigned to specific sprints but NO user assigned
+        query = query.filter(Task.sprint_id.in_(sprint_ids), Task.user_id.is_(None))
+
+    # Logic for Assignment/Sprint filtering
+    elif user_ids:
+        # Assigned to specific users but NOT assigned to a sprint
+        query = query.filter(Task.user_id.in_(user_ids), Task.sprint_id.is_(None))
+
+    # Attribute Filters
+    if work_type:
+        query = query.filter(Task.work_type == work_type)
+    if work_flow:
+        query = query.filter(Task.work_flow == work_flow)
+    if priority:
+        query = query.filter(Task.priority == priority)
+    if story_points is not None:
+        query = query.filter(Task.story_points == story_points)
+    if description:
+        query = query.filter(Task.description.ilike(f"%{description}%"))
+    if parent_task is not None:
+        query = query.filter(Task.parent_task == parent_task)
 
     return query.all()
 

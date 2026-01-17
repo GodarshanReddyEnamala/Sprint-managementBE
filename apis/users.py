@@ -5,6 +5,7 @@ from models.user import User   # correct model
 from models.project import Project
 from apis.schemas.user import UserCreate, UserUpdate, UserGet
 import datetime
+from typing import Optional
 
 router = APIRouter()
 
@@ -57,10 +58,15 @@ def get_users_by_project(project_id: int, db: Session = Depends(get_db), ):
     return db.query(User).join(User.projects).filter(Project.id == project_id).all()
 
 
-@router.get("/organisation/{organisation}")  
-def get_users_by_organisation(organisation: str, db: Session = Depends(get_db), ):
-    return db.query(User).filter(User.organisation == organisation).all()
-
+@router.get("/assignproject/{organisation}")  
+def get_users_by_organisation_project(organisation: str, project_id: int, db: Session = Depends(get_db), ):
+    
+        return db.query(User).join(User.projects).filter(User.organisation == organisation, Project.id != project_id).all()
+   
+@router.get("/unassignproject/{organisation}")  
+def get_users_by_organisation_project(organisation: str, project_id: int, db: Session = Depends(get_db), ):
+    
+        return db.query(User).join(User.projects).filter(User.organisation == organisation, Project.id == project_id).all()
 
 # GET USER BY ID
 @router.get("/{user_id}")

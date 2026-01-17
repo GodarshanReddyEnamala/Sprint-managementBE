@@ -7,11 +7,15 @@ class WorkType(str, Enum):
     TASK = "Task"
     STORY = "Story"
     REVIEW = "Review"
+    CLOSED = "Closed - Won't Do"
 
 class Workflow(str, Enum):
     BACKLOG = "Backlog"
     TODO = "To Do"
     IN_PROGRESS = "In Progress"
+    QA = "QA"
+    REVIEW = "Review"
+    CLOSED = "Closed - Won't Do"
     ON_HOLD = "On Hold"
     DONE = "Done"
 
