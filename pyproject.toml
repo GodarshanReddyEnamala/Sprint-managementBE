@@ -5,11 +5,17 @@
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry]
-name = "sprint-manager-backend"
+[project]
+name = "my-app"
 version = "0.1.0"
-description = ""
-package-mode = false
+dependencies = [
+    "requests>=2.31.0",
+]
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
