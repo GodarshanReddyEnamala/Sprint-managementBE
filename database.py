@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from fastapi import Depends
@@ -7,8 +8,8 @@ from sqlalchemy.orm import Session
 
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@host:port/dbname"
-#"postgresql://postgres:root@localhost:5432/Sprint_Manager"
+SQLALCHEMY_DATABASE_URL = os.getenv("POSTGRES_URL")
+
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
