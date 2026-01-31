@@ -1,0 +1,35 @@
+[project]
+name = "sprint-manager-backend"
+version = "0.1.0"
+description = "Sprint Manager Backend"
+requires-python = ">=3.11"
+# UV/Vercel reads from here
+dependencies = [
+    "requests>=2.31.0",
+    "fastapi>=0.122.0",
+    "uvicorn>=0.38.0",
+    "sqlalchemy>=2.0.44",
+    "google>=3.0.0",
+    "python-dotenv>=1.2.1",
+    "psycopg2-binary>=2.9.11",
+    "werkzeug>=1.0.1",
+    "charset-normalizer (>=3.4.4,<4.0.0)",
+    "google-genai (>=1.59.0,<2.0.0)",
+    "chardet (>=5.2.0,<6.0.0)",
+    "urllib3 (==1.21.1)",
+    "certbot (>=5.2.2,<6.0.0)"
+]
+
+[tool.uv]
+# This is the "Magic" line that stops uv from trying to build your folder
+package = false
+
+[tool.poetry]
+# Keep this for your local poetry dev environment
+name = "sprint-manager-backend"
+version = "0.1.0"
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
